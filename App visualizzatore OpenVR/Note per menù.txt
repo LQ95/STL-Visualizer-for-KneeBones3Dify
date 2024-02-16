@@ -1,0 +1,3 @@
+L'idea è di premere il tasto con Menù per mettere in pausa la visualizzazione dell'osso e vedere il menù con le relative opzioni.
+
+Poi bisogna scegliere come usare i vari bottoni.
