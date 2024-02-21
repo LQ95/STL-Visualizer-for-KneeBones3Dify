@@ -10,12 +10,17 @@ import sys
 
 
 """
-Minimal sdl programming example which colored OpenGL cube scene that can be closed by pressing ESCAPE.
+This is the main entry point of the visualizer, that unites, defines and executes everything else
 """
 
 
 if __name__ == "__main__":
-	print(sys.argv)
+	#you can either execute this program in standalone mode, 
+	#without rerendering the STL model,
+	#or in conjuction with the segmentation program, which enables you to rerender it 
+
+	#print(sys.argv,file=sys.stderr)
+	print("\n\nSTL Visualizer\n\n",file=sys.stderr)
 	stl_location= None
 	dataset_location= None
 	temp_output_file_location= None
@@ -26,12 +31,19 @@ if __name__ == "__main__":
 		dataset_location= sys.argv[2]
 		temp_output_file_location= sys.argv[3]
 		standalone= False
-	
+		print("Non stand-alone mode",file=sys.stderr)
+	else:
+		print("stand-alone mode",file=sys.stderr)
+
+	#this renderer is what actually sends all rendering data to the VR
+	#essentially, it sets up a custom framebuffer, which is what the VR headset sees
+	#and all that is appeneded onto the renderer is sent onto that framebuffer
 	renderer = OpenVrGlRenderer(multisample=2)
 	controlMod= None
-	controlMod=controlInputModule(renderer.poses,dataset_location,temp_output_file_location)
+	controlMod=controlInputModule(renderer.poses,dataset_location,temp_output_file_location,standalone)
 	renderer.append(ThreeDKnee(renderer.poses,controlMod,stl_location))
 	renderer.append(MenuScreen(controlMod))
 	renderer.append(TrackedDevicesActor(renderer.poses))
-	with SdlApp(renderer, "Visualizzazione di un ginocchio in VR") as app:
+	#This is what gives the renderer its OpenGL context
+	with SdlApp(renderer, "VR visualization of a knee bone") as app:
 		app.run_loop()

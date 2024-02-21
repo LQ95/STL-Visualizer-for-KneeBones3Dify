@@ -1,5 +1,6 @@
 #import glm
 import os
+import sys
 import numpy
 import openvr
 import math
@@ -31,21 +32,21 @@ class ThreeDKnee(object):
         loader.load_stl(stl_location)
         model=loader.model
 
-        #converto i dati di assimp in array numpy 
+        #converting assimp data into numpy arrays 
         vertices_array=numpy.array(model.meshes[0].vertices)
         normals_array=numpy.array(model.meshes[0].normals)
 
         
-        #normalizzazione
+        #normalization
         min_val = numpy.min(vertices_array)
         max_val = numpy.max(vertices_array)
         vertices_array_normalized = (vertices_array - min_val) / (max_val - min_val)
 
-        #costruzione array finale
+        #building the final array of normals and vertices combined that will be sent into the array
         vertices_and_normals= numpy.ones((vertices_array.size+normals_array.size,4),dtype=numpy.float32)
         
 
-        for index,v in enumerate(vertices_array_normalized): #aggiungo coordinata W altrimenti lo shader non lo legge bene
+        for index,v in enumerate(vertices_array_normalized): #adds a W coordinate, otherwise the shader won't read it properly
                 vertices_and_normals[index*2][0]=v[0]
                 vertices_and_normals[index*2][1]=v[1]
                 vertices_and_normals[index*2][2]=v[2]
@@ -57,6 +58,8 @@ class ThreeDKnee(object):
         glBufferData(GL_SHADER_STORAGE_BUFFER, (vertices_array.size -2) * vertices_array.itemsize, vertices_and_normals, GL_STATIC_DRAW)
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, self.ssbo)
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0)
+        #updating the number of vertices so that the correct number of vertices is drawn
+        self.num_vert=model.meshes[0].num_vertices
 
     
     def __init__(self,pose_array,control_mod,stl_location= None):
@@ -84,30 +87,32 @@ class ThreeDKnee(object):
     def find_headset_pose(self):
         for i in range(1, len(self.pose_array)):
             pose = self.pose_array[i]
-            #print (self.pose_array[i].mDeviceToAbsoluteTracking)
+            #print (self.pose_array[i].mDeviceToAbsoluteTracking,file=sys.stderr)
             if not pose.bDeviceIsConnected:
                 continue
             if not pose.bPoseIsValid:
                 continue
                 device_class = openvr.VRSystem().getTrackedDeviceClass(i)
                 if device_class == openvr.TrackedDeviceClass_HMD:
-                    print ("headset trovato")
+                    print ("headset found",file=sys.stderr)
                     return pose
 
 
 
 
-    #codice grafica
     
+
+    #this method is called by OpenVrGlRenderer to initialize everything
     def init_gl(self):
-  #servono model e view matrix separate
+  
         vertex_shader = compileShader(#glVertex*2 quando hai fatto l'interlacciamento con le normali
             shader_string("""
             // Adapted from @jherico's RiftDemo.py in pyovr
-            
+            //these are sent from the renderer
             layout(location = 0) uniform mat4 Projection = mat4(1);
             layout(location = 4) uniform mat4 ModelView = mat4(1);
             
+            //these are user defined and/or controlled
             layout(location = 8) uniform mat4 Model = mat4(1);
 
             layout(location = 12) uniform vec3 lightPos_world;
@@ -118,6 +123,7 @@ class ThreeDKnee(object):
             
             float Size = 0.7;
             
+            //this  is where the SSBO uploads to
             layout(std430, binding = 3) buffer positionBuffer
             {
                 vec4 position_and_normals[];
@@ -128,40 +134,8 @@ class ThreeDKnee(object):
 
 
 
-            //Rotation transformation
+            //Transformations
 
-            mat4 rotation3dX(float angle) {
-            float s = sin(angle);
-            float c = cos(angle);
-
-            return mat4(
-            1.0, 0.0, 0.0, 0.0,
-            0.0, c, s, 0.0,
-            0.0, -s, c, 0.0,
-            0.0, 0.0, 0.0, 1.0);
-            }
-
-            mat4 rotation3dY(float angle) {
-            float s = sin(angle);
-            float c = cos(angle);
-
-            return mat4(
-            c, 0.0, -s, 0.0,
-            0.0, 1.0, 0.0, 0.0,
-            s, 0.0, c, 0.0,
-            0.0, 0.0, 0.0, 1.0);
-            }
-
-            mat4 rotation3dZ(float angle) {
-                float s = sin(angle);
-                float c = cos(angle);
-
-                return mat4(
-                    c, s, 0.0, 0.0,
-                    -s, c, 0.0, 0.0,
-                    0.0, 0.0, 1.0, 0.0,
-                    0.0, 0.0, 0.0, 1.0);
-                }
 
             mat4 rotationMatrix(vec3 axis, float angle)
                 {
@@ -191,6 +165,7 @@ class ThreeDKnee(object):
             
 
 
+            // this data is used in the fragment shader to light the model properly
 
             out vec3 Normal_cameraspace;
             out vec3 EyeDirection_cameraspace;
@@ -201,13 +176,21 @@ class ThreeDKnee(object):
             vec3 vertexNormal_modelspace;
             vec3 currpos;
             
+            //this is used to bring the model from the origin to a position that is right in front of the user
+
             mat4 DefaultTranslationMatrix = TranslationMatrix(0.1,1.3,-0.8);
+
+            // this is used to rotate the model so that the kneecap is visible
+
             mat4 DefaultRotationMatrix = rotationMatrix(vec3(0,0,1), 3.14) * rotationMatrix(vec3(0,1,0), -1.57);
             
+            //this is the translation that comes from the controller
+
             mat4 UserControlTranslationMatrix = TranslationMatrix(translateDelta.x,translateDelta.y,translateDelta.z);
              
 
 
+            //all transformations are then packed into one matrix
 
             mat4 Modified_Model= UserControlTranslationMatrix * DefaultTranslationMatrix * UserControlRotationMatrix * DefaultRotationMatrix ;
 
@@ -215,34 +198,26 @@ class ThreeDKnee(object):
 
               
              
-              //normali
+              //normals
               vertexNormal_modelspace = normalize(vec3(position_and_normals[(gl_VertexID*2)+1].x, position_and_normals[(gl_VertexID*2)+1].y,position_and_normals[(gl_VertexID*2)+1].z));
               vertexNormal_modelspace= (mat3(transpose(inverse(Modified_Model))) * vertexNormal_modelspace);
-              
-
-              //vertexNormal_modelspace= (UserControlRotationMatrix * vec4(vertexNormal_modelspace,1.0)).xyz;
-              //vertexNormal_modelspace = (DefaultTranslationMatrix * vec4(vertexNormal_modelspace,1.0)).xyz;
 
               Normal_cameraspace = ( ModelView* vec4(vertexNormal_modelspace,1.0)).xyz;
               
-              //cerco di generare il modello centrato rispetto all'origine
-              //currpos= vec3(position_and_normals[gl_VertexID*2].x-0.55, position_and_normals[gl_VertexID*2].y,position_and_normals[gl_VertexID*2].z- 0.57);
+              
               float x_coeff;
               float z_coeff;
               float y_coeff;
               x_coeff = -0.67;
               y_coeff = -0.5;
               z_coeff = -0.47;
-              
-              //posizioni dei vertici
+              //this is an attempt to center the model to the origin
+              //position of the current vertex
+              // we use gl_VertexID*2 because positions are interpolated with the normals in the array we sent to this shader
+
               currpos = vec3(position_and_normals[gl_VertexID*2].x+x_coeff, position_and_normals[gl_VertexID*2].y+y_coeff,position_and_normals[gl_VertexID*2].z+z_coeff);
               
               currpos= (Modified_Model * vec4(currpos,1.0)).xyz;
-
-              //ruoto sull'asse dell'origine
-              //currpos= (UserControlRotationMatrix  * vec4(currpos,1.0)).xyz;
-              // traslo davanti agli occhi dell'utente
-              //currpos = (DefaultTranslationMatrix * vec4(currpos,1.0)).xyz;
 
               
 
@@ -312,8 +287,7 @@ class ThreeDKnee(object):
                         MaterialAmbientColor +
                         // Diffuse : "color" of the object
                             MaterialDiffuseColor * LightColor * LightPower * cosTheta ;
-                        // Specular : reflective highlight, like a mirror
-                           // MaterialSpecularColor * LightColor * LightPower * pow(cosAlpha,5) / (distance*distance);
+                       
             }
             """), 
             GL_FRAGMENT_SHADER)
@@ -321,44 +295,34 @@ class ThreeDKnee(object):
         #
         self.vao = glGenVertexArrays(1)
         glBindVertexArray(self.vao)
-        # array_buffer=glGenBuffers(1)
-        # glBindBuffer(GL_ARRAY_BUFFER,array_buffer)
-        # glBufferData(GL_ARRAY_BUFFER, model.meshes[0].num_vertices * sizeof(GLfloat*3), numpy.array(model.meshes[0].vertices), GL_STATIC_DRAW)
+        
+        #leaving these here becuase they could be useful for debugging
+        #print("python properties of the mesh object:\n",file=sys.stderr)
+        #print(dir(model.meshes[0]),file=sys.stderr)
+        #print("\n",file=sys.stderr)
+        #print("number of vertices:",file=sys.stderr)
+        #print(model.meshes[0].num_vertices,file=sys.stderr)
+        #print("length of index array:",file=sys.stderr)
+        #print(len(model.meshes[0].indices),file=sys.stderr)
+        #print("length of normal array:",file=sys.stderr)
+        #print(len(model.meshes[0].normals),file=sys.stderr)
+        print("processing model data...",file=sys.stderr)
 
-        # posAttrib = glGetAttribLocation(program, "position")
-        # glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_TRUE, 0, 0);
-        # glEnableVertexAttribArray(posAttrib);
-        # glEnable(GL_DEPTH_TEST)
-        print("proprietà oggetto mesh in python:")
-        print(dir(model.meshes[0]))
-        print("\n")
-        print("num vertici:")
-        print(model.meshes[0].num_vertices)
-        print("num uv:")
-        print(model.meshes[0].num_uv_components)
-        print("colori:")
-        print(model.meshes[0].colors)
-        print("lunghezza array indici:")
-        print(len(model.meshes[0].indices))
-        print("lunghezza array normali:")
-        print(len(model.meshes[0].normals))
-
-
-        #converto i dati di assimp in array numpy 
+        #converting assimp data into numpy arrays 
         vertices_array=numpy.array(model.meshes[0].vertices)
         normals_array=numpy.array(model.meshes[0].normals)
 
         
-        #normalizzazione
+        #normalization
         min_val = numpy.min(vertices_array)
         max_val = numpy.max(vertices_array)
         vertices_array_normalized = (vertices_array - min_val) / (max_val - min_val)
 
-        #costruzione array finale
+        #building the final array of normals and vertices combined that will be sent into the array
         vertices_and_normals= numpy.ones((vertices_array.size+normals_array.size,4),dtype=numpy.float32)
         
-
-        for index,v in enumerate(vertices_array_normalized): #aggiungo coordinata W altrimenti lo shader non lo legge bene
+        #adds a W coordinate,otherwise the shader won't read it correctly
+        for index,v in enumerate(vertices_array_normalized): 
                 vertices_and_normals[index*2][0]=v[0]
                 vertices_and_normals[index*2][1]=v[1]
                 vertices_and_normals[index*2][2]=v[2]
@@ -366,7 +330,10 @@ class ThreeDKnee(object):
                 vertices_and_normals[(index*2)+1][1]=normals_array[index][1]
                 vertices_and_normals[(index*2)+1][2]=normals_array[index][2]
 
-        #carico array su shader storage buffer object che poi lo carica nello shader
+        
+        print("initializing visualization...",file=sys.stderr)
+        
+        #A Shader Storage Buffer Object(SSBO) loads model data into the vertex shader 
         self.ssbo=glGenBuffers(1)
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, self.ssbo)
         glBufferData(GL_SHADER_STORAGE_BUFFER, (vertices_array.size -2) * vertices_array.itemsize, vertices_and_normals, GL_STATIC_DRAW)
@@ -378,20 +345,37 @@ class ThreeDKnee(object):
 
 
 
-    #Questo metodo viene chiamato da OpenVrGlRenderer, una volta per occhio
+    #this method is called continuosly by OpenVrGlRenderer, once per eye
+    #who sends it the modelview and projection matrices in each call
     def display_gl(self, modelview, projection):
-        
+        #control module stores, modifies and sends a rotation matrix and a translation delta 
+        #those are then sent to the shader 
         translationDelta,rotationMatrix = controlMod.control()
 
         if(controlMod.re_rendering == True):
-            #print("risulta che sto ri-renderizzando il modello")
-            #print("tempo di modifica 1: " + str(controlMod.temp_file_modified))
-            #print("tempo di modifica 2: " + str(os.path.getmtime(controlMod.temp_output_file_location)) )
-
+            #a modification of a file is how we know that the re-rendering is done
             if(controlMod.temp_file_modified != os.path.getmtime(controlMod.temp_output_file_location)):
-                print("ricarico il modello")
+                print("reloading the STL model",file=sys.stderr)
+
+                #reloads and tells the menu to refresh itself in order to show that reredering is done
+                #exits the menu if it is enabled
                 self.reload_model(self.stl_location)
                 controlMod.re_rendering = False
+                controlMod.menuStatus.menu_dict['re-rendering'] = False
+                controlMod.menuStatus.menu_dict['modified'] = True
+                paused = controlMod.menuStatus.menu_dict['enabled']
+                #sets every flag properly, as if the menu was exited manually 
+                #also resets the selected parameter
+                if(paused):
+                    controlMod.translationDelta[2]+=3
+                    controlMod.menuStatus.menu_dict['enabled'] = False
+                    controlMod.right_pause_pressed = False
+                    controlMod.left_pause_pressed = False
+                    controlMod.left_menu_enabled = False
+                    controlMod.right_menu_enabled = False
+                    controlMod.paused = False
+                    controlMod.menuStatus.selected_param = 0
+                print("done",file=sys.stderr)
     
 
 
@@ -401,12 +385,12 @@ class ThreeDKnee(object):
         model=[[1,1,1,1],[1,1,1,1],[1,1,1,1],[1,1,1,1]]
         light_pos=[0.0,0.0,0.0]
         glUniformMatrix4fv(8, 1, False, numpy.array(model))
-        #prendi luce dal punto in cui si trova l'elmetto
+        #get the HMD position to use it in the lighting code 
         HMD_pose=self.pose_array[0]
   
         HMD_matrix=HMD_pose.mDeviceToAbsoluteTracking
         light_pos=[HMD_matrix[0][3],HMD_matrix[1][3],HMD_matrix[2][3]]
-        #print(light_pos)
+        #print(light_pos,,file=sys.stderr)
         glUniform3f(12, light_pos[0], light_pos[1],light_pos[2])
         glUniform3f(15, translationDelta[0], translationDelta[1],translationDelta[2])
         glUniformMatrix4fv(18, 1, False, numpy.array(rotationMatrix))
@@ -414,7 +398,7 @@ class ThreeDKnee(object):
         glBindVertexArray(self.vao)
         glDrawArrays(GL_TRIANGLES, 0, self.num_vert)
 
-    
+    #this method is called by OpenVrGlRenderer at the end of the program 
     def dispose_gl(self):
         glDeleteProgram(self.shader)
         self.shader = 0

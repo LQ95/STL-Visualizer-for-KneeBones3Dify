@@ -103,8 +103,7 @@ def main():
 
     
     global dataset, SogliaCrop, CHadd, FinalClosing, Protrus, Edges, flags,fin,data1,name
-    #questo va reso così: mentre flag di esecuzione è vero esegui tutte le funzioni
-    #quando arrivi alla fine apri il visualizzatore nella realtà virtuale e aspetta una risposta dal suddetto
+    
 
     
     sG()
@@ -128,51 +127,94 @@ def main():
     #temp_output_file = tempfile.NamedTemporaryFile()
     #temp_output_file_path=temp_output_file.name
     temp_output_file_path=tempfile.gettempdir() + "\\pipetest"
+    #creates the file,if it doesn't exist
     temp_output_file =open(temp_output_file_path, "r+")
     temp_output_file.close()
     command = f"py ..\\STLVisualizer.py " + " " + "\"" +  STL_model_path + "\"" + " " + "\"" + dataset + "\"" + " " + "\"" + temp_output_file_path + "\"" # the shell command
-    #process = Popen(command, stdout=None, stderr=None, shell=False)
-        
     process = Popen(command, stdout=None, stderr=None, shell=False)
+        
+    #process = Popen(command, stdout=subprocess.PIPE, stderr=None, shell=False)
 
     
+    #print("visualizer is open")
     
-    #fin = g.GuiFin(name+".stl",data1)
 
 
-    #ciclo solo per i re-render, senza usare la gui
+    #re-render cycle, does not use the GUI
     exec_without_gui= True
     while(exec_without_gui):
-        #il visualizzatore da un output su questo file temporaneo
+        #visualizer outputs new parameters on this file
         time_modified_at_exec =  os.path.getmtime(temp_output_file_path)
         while(time_modified_at_exec == os.path.getmtime(temp_output_file_path)):
-            #print("SegOscan3 aspetta, tempo originale modifica del file:")
-            #print(time)
-            #print("SegOscan3 aspetta, tempo attuale modifica del file:")
-            #print(os.path.getmtime(temp_output_file_path))
+            #this is actually necessary 
+            #python uses buffers to write to files
+            #this interval of waiting gives the visualizer enough time to use the file buffers properly and actually write to it
+            time.sleep(0.1)
             continue
+            time.sleep(0.1)
         temp_output_file =open(temp_output_file_path, "r+")
-        #outputString = temp_output_file.file.readline()
         outputString = temp_output_file.readline()
+        #print("aspetto di leggere dal visualizzatore")
+        
         temp_output_file.close()
-        print("ho aperto il file da SegOscan3, output:")
-        #non capisco ancora perchè ma la prima volta che viene scritto dal visualizzatore risulta vuoto
-        #indagare, prima di eseguire di nuovo questo codice
+        print("Segmentation software has read from file")
         
         if (outputString):
-            print("ho aperto il file da SegOscan3, output:")
-            print(outputString)
+            print("parameters have been loaded and parsed")
             params_dict= convert_string_into_param_dict(outputString)
-            print(params_dict)
+            
 
             #parametri provenienti dal visualizzatore
-            SogliaCrop = params_dict['intensity_threshold'] 
-            CHAdd = params_dict['convex_hull_dilation'] 
-            FinalClosing = params_dict['final_closing'] 
-            Protrus = params_dict['protrusion_removal'] 
-            Edges = params_dict['final_dilation']
+            SogliaCropG = params_dict['intensity_threshold'] 
+            CHaddG = params_dict['convex_hull_dilation'] 
+            FinalClosingG = params_dict['final_closing'] 
+            ProtrusG = params_dict['protrusion_removal'] 
+            EdgesG = params_dict['final_dilation']
 
+            print("\n\n###############################")
+            print("### Re-rendering Input Data")
+            print("###############################\n")
+            print("Dataset:", dataset)
+            print("SogliaCrop:", SogliaCropG)
+            print("CHadd:", CHaddG)
+            print("FinalClosing:", FinalClosingG)
+            print("Protrus:", ProtrusG)
+            print("Edges:", EdgesG)
+            #rende possibile la parzializzazione del rerendering
+            flags = np.asarray([s0,s1,s2,s3,s4,s5,s6,s7,s8])
+            if(SogliaCropG != SogliaCrop):
+                flags = np.asarray([s1,s2,s3,s4,s5,s6,s7,s8])
+                print("\n\n###############################")
+                print("### Restart from state 1")
+                print("###############################\n")
+            elif(CHaddG != CHadd):
+                flags = np.asarray([s2,s3,s4,s5,s6,s7,s8])
+                print("\n\n###############################")
+                print("### Restart from state 2")
+                print("###############################\n")
+            elif(FinalClosingG != FinalClosing):
+                flags = np.asarray([s3,s4,s5,s6,s7,s8])
+                print("\n\n###############################")
+                print("### Restart from state 3")
+                print("###############################\n")   
+            elif(ProtrusG != Protrus):
+                flags = np.asarray([s4,s5,s6,s7,s8])
+                print("\n\n###############################")
+                print("### Restart from state 4")
+                print("###############################\n")
+            elif(EdgesG != Edges):
+                flags = np.asarray([s5,s6,s7,s8])
+                print("\n\n###############################")
+                print("### Restart from state 5")
+                print("###############################\n")
+
+            SogliaCrop = SogliaCropG
+            CHadd = CHaddG
+            FinalClosing = FinalClosingG 
+            Protrus = ProtrusG
+            Edges = EdgesG
             try:
+                Tstart = timeit.default_timer()
                 for f in flags:
                     f()
             except:
@@ -181,16 +223,17 @@ def main():
                 print("                        ################")
                 g.GuiError()
 
-            #segnala al visualizzatore che il render è finito
+            #empty modification to the temporary file, so that the visualizer knows we are done with the rerendering
             temp_output_file =open(temp_output_file_path, "w")
             temp_output_file.write("")
+            temp_output_file.close()
 
 
         else:
-            print("stringa di output vuota")
+            print("Error: nothing was read from file.")
 
 
-        #time.sleep(5)
+        
 
 
 
@@ -207,7 +250,7 @@ def sG():
     print("\n\n###############################")
     print("### Input Data")
     print("###############################\n")
-    print("Dataset:", datasetG)
+    print("Dataset:", dataset)
     print("SogliaCrop:", SogliaCropG)
     print("CHadd:", CHaddG)
     print("FinalClosing:", FinalClosingG)
@@ -708,6 +751,15 @@ def s8():
     #command = f"py ..\\STLVisualizer.py " + " " + "\"" +  STL_model_path + "\"" + " " + "\"" + dataset + "\"" # the shell command
     #process = Popen(command, stdout=None, stderr=None, shell=False)
     #process = Popen(command, stdout=subprocess.PIPE, stderr=None, shell=False)
+    # print("\n\n###############################")
+    # print("### Reprinting Input Data")
+    # print("###############################\n")
+    # print("Dataset:", dataset)
+    # print("SogliaCrop:", SogliaCrop)
+    # print("CHadd:", CHadd)
+    # print("FinalClosing:", FinalClosing)
+    # print("Protrus:", Protrus)
+    # print("Edges:", Edges)
     
 def convert_string_into_param_dict(output_string):
     parameters_from_string=output_string.split("%")

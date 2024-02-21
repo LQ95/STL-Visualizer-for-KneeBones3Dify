@@ -7,6 +7,7 @@ import time
 import math
 import multiprocessing
 import queue
+import sys
 from textwrap import dedent
 
 from OpenGL.GL import *  # @UnusedWildImport # this comment squelches an IDE warning
@@ -15,7 +16,7 @@ from OpenGL.GL.shaders import compileShader, compileProgram
 from openvr.glframework import shader_string
 from controlModule import controlInputModule
 from TextureControl import TextureControl
-#variabili globali
+#global variables
 controlMod= None
 menu_width=900
 texControl= TextureControl(menu_width)
@@ -27,13 +28,15 @@ texture_is_loading= multiprocessing.Value(ctypes.c_bool,False)
 
 shared_queue= multiprocessing.Queue(maxsize=2)
 
-#funzione eseguita dal subprocesso
+#this is the subroutine that the subprocess executes
 def tex_modify_proc_routine(shared_queue, texture_proc_done, texture_proc_generate,processOver,menu_width,texture_is_loading):
     
     #setup
     texControl= TextureControl(menu_width)
+    rerendering_has_been_flagged= False
+    status = None
 
-    #non bellissimo ma almeno dovrebbe essere indolore
+    #htis is necessary to have the menu texture look correct
     menu_dict= {}
     menu_dict['intensity_threshold'] = 600
     menu_dict['convex_hull_dilation'] = 6
@@ -44,38 +47,56 @@ def tex_modify_proc_routine(shared_queue, texture_proc_done, texture_proc_genera
     
     #ciclo
     while(1):
-        #print("subprocesso avviato, flag generazione: ")
-        #print(texture_proc_generate.value)
-        #print("subprocesso avviato, flag processOver: ")
-        #print(processOver.value)
+        #print("subprocesso avviato, flag generazione: ",file=sys.stderr)
+        #print(texture_proc_generate.value,file=sys.stderr)
+        #print("subprocesso avviato, flag processOver: ",file=sys.stderr)
+        #print(processOver.value,file=sys.stderr)
+        
+            
         
         if(texture_proc_generate.value  == True):
-            print("sono nel sub-processo e sto generando")
+            #print("the sub-process is generating a texture",file=sys.stderr)
 
-            print("dimensione coda prima di prendere quello che ci ha messo l'utente?:")
-            print(shared_queue.qsize())
+            #print("queue size before extracting user input:",file=sys.stderr)
+            #print(shared_queue.qsize(),file=sys.stderr)
             
             received=shared_queue.get()
-            print("ricevo status")
             status= received[0]
-            print("ricevo param selezionato")
             selected_param= received[1]
-            print("status:")
-            print(status)
+            #print("status:",file=sys.stderr)
+            #print(status,file=sys.stderr)
             
-            print("parametro selezionato:")
-            print(selected_param)
+            #print("parametro selezionato:",file=sys.stderr)
+            #print(selected_param,file=sys.stderr)
+            
+            #we set this shared value true 
+            #this way, the rendering routine can't send anything, 
+            #while we're still modifying the texture here
 
             texture_is_loading.value = True
+
+            if(status['re-rendering'] == True):
+                if(rerendering_has_been_flagged == False):
+                    texControl.flagRerendering()
+                    rerendering_has_been_flagged = True
             menu_tex= texControl.modifyTexture(status,selected_param)
             
             
-            print("dimensione coda prima di metterci una texture?:")
-            print(shared_queue.qsize())
+            #print("queue size before putting a texture on it:",file=sys.stderr)
+            #print(shared_queue.qsize(),file=sys.stderr)
 
             shared_queue.put(menu_tex)
             texture_proc_done.value= True
             texture_proc_generate.value= False
+        if (status!= None):
+
+            if(status['re-rendering'] == False):
+                if(rerendering_has_been_flagged == True):
+                    texture_is_loading.value = True
+                    menu_tex = texControl.unflagRerendering()
+                    rerendering_has_been_flagged = False
+                    shared_queue.put(menu_tex)
+                    texture_proc_done.value= True
 
 
 texture_modifying_process = multiprocessing.Process(target=tex_modify_proc_routine, args = (shared_queue, texture_proc_done, texture_proc_generate, processOver,menu_width,texture_is_loading ))
@@ -101,16 +122,11 @@ class MenuScreen(object):
         
         self.shader = 0
         self.vao = None
-        self.window_vertices= [
-         [0.3, 0.4, 0.0,1.0], # bottom right
-        [+0.0, 1.0, 1.0,1.0],  # bottom left
-         [0.0, 0.0, 1.0,1.0],
-         [+1.0, 0.0, 0.5,1.0]    # top 
-         ]
+   
         
         self.menu_texture= None
-        self.pixel_buffer= None
-        self.mapped_pixel_buffer = None 
+        #self.pixel_buffer= None
+        #self.mapped_pixel_buffer = None 
         self.tex = None 
         self.width=menu_width
         self.height=math.ceil(self.width/1.57)
@@ -170,56 +186,53 @@ class MenuScreen(object):
             """), 
             GL_FRAGMENT_SHADER)
 
-        success = glGetShaderiv(vertex_shader, GL_COMPILE_STATUS);
-        print("vertex:")
-        print(success)
-        print(glGetShaderInfoLog(vertex_shader))
-        success = glGetShaderiv(fragment_shader, GL_COMPILE_STATUS);
-        print("fragment:")
-        print(success)
-        print(glGetShaderInfoLog(fragment_shader))
-        print("program:")
+        #success = glGetShaderiv(vertex_shader, GL_COMPILE_STATUS);
+        #print("vertex:",file=sys.stderr)
+        #print(success,file=sys.stderr)
+        #print(glGetShaderInfoLog(vertex_shader),file=sys.stderr)
+        #success = glGetShaderiv(fragment_shader, GL_COMPILE_STATUS);
+        #print("fragment:",file=sys.stderr)
+        #print(success,file=sys.stderr)
+        #print(glGetShaderInfoLog(fragment_shader),file=sys.stderr)
+        #print("program:",file=sys.stderr)
+        
         self.shader = compileProgram(vertex_shader, fragment_shader)
-        glGetProgramInfoLog(self.shader)
+        #glGetProgramInfoLog(self.shader)
         error=glGetError()
         if error != 0:
-            print(glGetError())
-        success=0
-        success = glGetProgramiv(self.shader, GL_LINK_STATUS);
-        print(success)
-        print(glGetProgramInfoLog(self.shader))
+            print(glGetError(),file=sys.stderr)
+        #success=0
+        #success = glGetProgramiv(self.shader, GL_LINK_STATUS);
+        #print(success,file=sys.stderr)
+        #print(glGetProgramInfoLog(self.shader),file=sys.stderr)
 
         self.vao = glGenVertexArrays(1)
         
         glBindVertexArray(self.vao)
-        #print(sizeof(GLfloat))
+        #print(sizeof(GLfloat),file=sys.stderr)
         
         
-        vertices_array=numpy.array(self.window_vertices)
-
-     
-
-        ssbo=glGenBuffers(1)
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo)
-        glBufferData(GL_SHADER_STORAGE_BUFFER, (vertices_array.size) * vertices_array.itemsize, vertices_array, GL_STATIC_DRAW)
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, ssbo)
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0)
         glEnable(GL_DEPTH_TEST)   
 
-        #inizializzo texture
+        #initializing a texture
         self.menu_texture = glGenTextures(1)
-        #print("generazione nome texture:")
-        #print(self.menu_texture)
-        #time.sleep(5)
+        #print("generating texture name:",file=sys.stderr)
+        #print(self.menu_texture,file=sys.stderr)
+        
         self.tex = texControl.generateTexture(controlMod.menuStatus.menu_dict,'intensity_threshold')
         
-        #questa istruzione va commentata se non uso più grayscale
+        #this instruction was used when the menu was rendered as a grayscale image visualized using the GL_RED mode
+        #if you decide to do that again this needs to be uncommented
+        #currently commented because the menu is a RGBA image right now
         #glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
         
         glBindTexture(GL_TEXTURE_2D, self.menu_texture)
-        #il formato interno GL_RGBA8 assieme al leggere ogni dato come un byte senza segno sono necessari per visualizzare correttametne il logo
+        #the GL_RGBA8 internal format is necessary to visualize the app logo correctly in the menu
+        #if the image is generated in RGBA mode like it is now
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8,self.width,self.height,0,GL_RGBA,GL_UNSIGNED_BYTE,self.tex)
         
+
+        #this instruction can be used for a possible performance increase if the image is generated in 8 bit grayscale
         #glTexImage2D(GL_TEXTURE_2D, 0, GL_R8,self.width,self.height,0,GL_RED,GL_UNSIGNED_BYTE,self.tex)
         glGenerateMipmap(GL_TEXTURE_2D)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
@@ -234,43 +247,49 @@ class MenuScreen(object):
         #glBufferData(GL_PIXEL_UNPACK_BUFFER,1100*700*16, None, GL_STREAM_DRAW)
         #glBindBuffer(GL_PIXEL_UNPACK_BUFFER,0)
         
+        #starts a sub process that modifies textures 
+        #implement the visual part of the interaction with the menu
+
         texture_modifying_process.start()
         time.sleep(3)
 
     def display_gl(self, modelview, projection):
         global shared_queue,menu_tex,texture_proc_generate,texture_proc_done,texture_is_loading
+        
+
         status,selected_param=controlMod.menuControl()
 
         if(status['enabled']):
-            #print("menù abilitato")
+            #print("menu is visible",file=sys.stderr)
             glUseProgram(self.shader)
             glUniformMatrix4fv(0, 1, False, projection)
             glUniformMatrix4fv(4, 1, False, modelview)
             glBindVertexArray(self.vao)
-            #comprendi come aggiornare texture
+            
             
             glBindTexture(GL_TEXTURE_2D, self.menu_texture)
 
 
            
 
-            if(status['modified'] and texture_is_loading.value == False):
-                #sposta questa istruzione dentro un processo separato,rendi la generazione delle texture asincrona
-                #self.tex=texControl.modifyTexture(status,selected_param)
-                print("ho modificato, mando su queue?")
+            if(status['modified'] and texture_is_loading.value == False ):
+
+                #print("sending menu status data and the selected menu parameter in the queue",file=sys.stderr)
                
                 shared_queue.put([status,selected_param])
                 
                 texture_proc_generate.value=True
-                #il sub-processo poi renderà questa ultima variabile falsa quando ha finito
+                #this variable will be modified once the sub process is done modifying the texture
                 
                 
-
+            #load the texture once the subprocess signals that it's done with it
             if(texture_proc_done.value == True):
-                print("il sub-processo ha finito")
+                print("sub-process is done modifying the texture",file=sys.stderr)
                 self.tex=shared_queue.get()
                 texture_is_loading.value = False
                 glTexSubImage2D(GL_TEXTURE_2D, 0,0,0,self.width,self.height,GL_RGBA,GL_UNSIGNED_BYTE,self.tex)
+                
+
                 #glTexSubImage2D(GL_TEXTURE_2D, 0,0,0,self.width,self.height,GL_RED,GL_UNSIGNED_BYTE,self.tex)
                 
                 texture_proc_done.value=False
@@ -285,7 +304,7 @@ class MenuScreen(object):
             
             error=glGetError()
             if error != 0:
-                print(error)
+                print(error,file=sys.stderr)
             glBindTexture(GL_TEXTURE_2D, 0)
 
             
