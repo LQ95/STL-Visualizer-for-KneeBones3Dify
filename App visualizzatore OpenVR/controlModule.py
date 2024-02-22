@@ -495,7 +495,26 @@ class controlInputModule:
 					self.right_trackpad_pressed= False
 
 
-
 		self.menuStatus.menu_dict = status
 		return status,self.menuStatus.getSelectedParam()
+		#related to model reloading
+	def automaticUnpause(self):
+		self.translationDelta[2]+=3
+		self.menuStatus.menu_dict['enabled'] = False
+		self.right_pause_pressed = False
+		self.left_pause_pressed = False
+		self.left_menu_enabled = False
+		self.right_menu_enabled = False
+		self.paused = False
+		
 
+	def refresh_menu_after_model_reloading(self):
+		self.re_rendering = False
+		self.menuStatus.menu_dict['re-rendering'] = False
+		self.menuStatus.menu_dict['modified'] = True
+		paused = self.menuStatus.menu_dict['enabled']
+		if(paused):
+			#sets every flag properly, as if the menu was exited manually 
+			#also resets the selected parameter
+			self.automaticUnpause()
+		self.menuStatus.selected_param = 0

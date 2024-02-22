@@ -206,7 +206,7 @@ class TextureControl(object):
 
 		param_coordinates= parameterCoordinates['re-render']
 
-		d.text(param_coordinates, "Re-rendering,\n please wait",font=fnt, fill=self.default_fill_color)
+		d.text(param_coordinates, "Re-rendering,\n please wait",font=fnt, fill=self.highlighted_fill_color)
 		self.parameterTextDescriptions['re-render']= "Re-rendering,\n please wait"
 		tex_array= numpy.array(list(tex.getdata()))  
 

@@ -13,6 +13,7 @@ from openvr.glframework import shader_string
 from STLinto3DModel import STLloader
 from controlModule import controlInputModule
 loader=STLloader()
+#this is where it loads the model from in standalone mode
 loader.load_stl('C:\\Users\\mrapo\\AppData\\Local\\Temp\\MRI.stl')
 model=loader.model 
 controlMod= None
@@ -67,11 +68,12 @@ class ThreeDKnee(object):
         
         self.shader = 0
         self.vao = None
-        self.vertex_iterator=itertools.cycle(model.meshes[0].vertices)
+        #self.vertex_iterator=itertools.cycle(model.meshes[0].vertices)
         self.num_vert=model.meshes[0].num_vertices
         self.pose_array= pose_array
         controlMod=control_mod
         self.stl_location= ""
+        #non-standalone mode
         if(stl_location!= None):
             self.stl_location= stl_location
             loader.load_stl(stl_location)
@@ -360,21 +362,7 @@ class ThreeDKnee(object):
                 #reloads and tells the menu to refresh itself in order to show that reredering is done
                 #exits the menu if it is enabled
                 self.reload_model(self.stl_location)
-                controlMod.re_rendering = False
-                controlMod.menuStatus.menu_dict['re-rendering'] = False
-                controlMod.menuStatus.menu_dict['modified'] = True
-                paused = controlMod.menuStatus.menu_dict['enabled']
-                #sets every flag properly, as if the menu was exited manually 
-                #also resets the selected parameter
-                if(paused):
-                    controlMod.translationDelta[2]+=3
-                    controlMod.menuStatus.menu_dict['enabled'] = False
-                    controlMod.right_pause_pressed = False
-                    controlMod.left_pause_pressed = False
-                    controlMod.left_menu_enabled = False
-                    controlMod.right_menu_enabled = False
-                    controlMod.paused = False
-                    controlMod.menuStatus.selected_param = 0
+                controlMod.refresh_menu_after_model_reloading()
                 print("done",file=sys.stderr)
     
 
