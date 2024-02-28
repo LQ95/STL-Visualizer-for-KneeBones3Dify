@@ -115,7 +115,7 @@ class ThreeDKnee(object):
             layout(location = 4) uniform mat4 ModelView = mat4(1);
             
             //these are user defined and/or controlled
-            layout(location = 8) uniform mat4 Model = mat4(1);
+            mat4 Model = mat4(1);
 
             layout(location = 12) uniform vec3 lightPos_world;
 
@@ -131,7 +131,7 @@ class ThreeDKnee(object):
                 vec4 position_and_normals[];
             };
             
-            mat4 View= ModelView/Model;
+            mat4 View= ModelView;
 
 
 
@@ -224,7 +224,7 @@ class ThreeDKnee(object):
               
 
 
-              Position_worldspace = (Model * vec4(currpos,1)).xyz;
+              Position_worldspace = vec4(currpos,1).xyz;
 
               vec3 vertexPosition_cameraspace = (ModelView * vec4(currpos* Size,1)).xyz;
               EyeDirection_cameraspace = vec3(0,0,0) - vertexPosition_cameraspace;
@@ -370,9 +370,9 @@ class ThreeDKnee(object):
         glUseProgram(self.shader)
         glUniformMatrix4fv(0, 1, False, projection)
         glUniformMatrix4fv(4, 1, False, modelview)
-        model=[[1,1,1,1],[1,1,1,1],[1,1,1,1],[1,1,1,1]]
+        #model=[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]
         light_pos=[0.0,0.0,0.0]
-        glUniformMatrix4fv(8, 1, False, numpy.array(model))
+        #glUniformMatrix4fv(8, 1, False, numpy.array(model))
         #get the HMD position to use it in the lighting code 
         HMD_pose=self.pose_array[0]
   
