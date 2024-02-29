@@ -224,14 +224,15 @@ class ThreeDKnee(object):
               
 
 
-              Position_worldspace = vec4(currpos,1).xyz;
+              Position_worldspace =  vec4(currpos,1).xyz;
 
               vec3 vertexPosition_cameraspace = (ModelView * vec4(currpos* Size,1)).xyz;
               EyeDirection_cameraspace = vec3(0,0,0) - vertexPosition_cameraspace;
 
               
 
-              LightPosition_worldspace = vec3(0,0.4,-0.3);
+              LightPosition_worldspace = vec3(0,0.35,-0.3);
+              
 
               vec3 LightPosition_cameraspace = ( View * vec4(LightPosition_worldspace,1)).xyz;
               LightDirection_cameraspace = LightPosition_cameraspace + EyeDirection_cameraspace;
@@ -255,7 +256,7 @@ class ThreeDKnee(object):
             
             void main() {
               vec3 LightColor = vec3(0.8,0.8,0.8);
-              float LightPower = 0.65f;
+              float LightPower = 0.7f;
 
               float distance = length( LightPosition_worldspace - Position_worldspace );
 
@@ -270,19 +271,11 @@ class ThreeDKnee(object):
               //  - light is behind the triangle -> 0
               float cosTheta = clamp( dot( n,l ), 0,1 );
 
-              // Eye vector (towards the camera)
-              vec3 E = normalize(EyeDirection_cameraspace);
-              // Direction in which the triangle reflects the light
-              vec3 R = reflect(-l,n);
-              // Cosine of the angle between the Eye vector and the Reflect vector,
-              // clamped to 0
-              //  - Looking into the reflection -> 1
-              //  - Looking elsewhere -> < 1
-              float cosAlpha = clamp( dot( E,R ), 0,1 );
               
-              vec3 MaterialDiffuseColor = vec3(0.8, 0.8, 0.8);
+              
+              vec3 MaterialDiffuseColor = vec3(0.7, 0.7, 0.7);
               vec3 MaterialAmbientColor = vec3(0.3,0.3,0.3) * MaterialDiffuseColor;
-              vec3 MaterialSpecularColor = vec3(0.5,0.5,0.5);
+              
 
 
               color = // Ambient : simulates indirect lighting
@@ -335,7 +328,7 @@ class ThreeDKnee(object):
         
         print("initializing visualization...",file=sys.stderr)
         
-        #A Shader Storage Buffer Object(SSBO) loads model data into the vertex shader 
+        #Shader Storage Buffer Object(SSBO) that loads model data into the vertex shader 
         self.ssbo=glGenBuffers(1)
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, self.ssbo)
         glBufferData(GL_SHADER_STORAGE_BUFFER, (vertices_array.size -2) * vertices_array.itemsize, vertices_and_normals, GL_STATIC_DRAW)

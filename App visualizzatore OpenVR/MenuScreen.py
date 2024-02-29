@@ -24,7 +24,7 @@ texture_proc_done = multiprocessing.Value(ctypes.c_bool,False)
 texture_proc_generate = multiprocessing.Value(ctypes.c_bool,False)
 processOver= multiprocessing.Value(ctypes.c_bool,False)
 texture_is_loading= multiprocessing.Value(ctypes.c_bool,False)
-#menu_tex= None
+
 
 shared_queue= multiprocessing.Queue(maxsize=2)
 
