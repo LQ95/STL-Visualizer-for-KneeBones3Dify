@@ -1,6 +1,9 @@
 import sys
 import os
 import argparse
+import atexit
+import signal
+from pynput import keyboard
 
 import SimpleITK as sitk
 import pyvista as pv
@@ -98,11 +101,26 @@ STL_model_path= ""
 
 first = True
 fin = True
+process= None
+
+def on_press_exit(key):
+    if key == keyboard.Key.esc:
+        kill_visualizer_process()
+        os._exit(0)
+        
+
+
+def kill_visualizer_process():
+    global process
+    if (process != None):
+        print("exiting visualizer")
+        os.kill(process.pid,signal.SIGTERM)
+
 
 def main():
 
     
-    global dataset, SogliaCrop, CHadd, FinalClosing, Protrus, Edges, flags,fin,data1,name
+    global dataset, SogliaCrop, CHadd, FinalClosing, Protrus, Edges, flags,fin,data1,name,process
     
 
     
@@ -120,6 +138,7 @@ def main():
         print("                        #### ERROR! ####")
         print("                        ################")
         g.GuiError()
+        return
         
 
     # for f in flags:
@@ -222,6 +241,8 @@ def main():
                 print("                        #### ERROR! ####")
                 print("                        ################")
                 g.GuiError()
+                return
+                
 
             #empty modification to the temporary file, so that the visualizer knows we are done with the rerendering
             temp_output_file =open(temp_output_file_path, "w")
@@ -231,6 +252,7 @@ def main():
 
         else:
             print("Error: nothing was read from file.")
+        
 
 
         
@@ -747,7 +769,7 @@ def s8():
     # esecuzione.close()
     print("dataset:")
     print(dataset)
-    print("\nOpening VR visualization...")
+    print("\nOpening VR visualization... (Press Esc to exit the entire program)")
     #command = f"py ..\\STLVisualizer.py " + " " + "\"" +  STL_model_path + "\"" + " " + "\"" + dataset + "\"" # the shell command
     #process = Popen(command, stdout=None, stderr=None, shell=False)
     #process = Popen(command, stdout=subprocess.PIPE, stderr=None, shell=False)
@@ -777,5 +799,13 @@ def convert_string_into_param_dict(output_string):
 
 flags = np.asarray([s0,s1,s2,s3,s4,s5,s6,s7,s8])
 
+atexit.register(kill_visualizer_process)
+signal.signal(signal.SIGABRT,kill_visualizer_process)
+signal.signal(signal.SIGTERM,kill_visualizer_process)
+exit_listener= keyboard.Listener(on_press=on_press_exit)
+exit_listener.start() 
+if os.name == "nt":
+    import win32api
+    win32api.SetConsoleCtrlHandler(kill_visualizer_process, True)
 
 main()
