@@ -2,6 +2,7 @@
 
 # Setup
 Install Python 3.9.13 https://www.python.org/downloads/release/python-3913/
+Install pip (if you have any specific issues with pip during setup, try reverting to version 22.0.4)
 
 # Setup for KneeBones3Dify
 
@@ -9,7 +10,7 @@ Install Python 3.9.13 https://www.python.org/downloads/release/python-3913/
 	python3.9 -m pip install -r requirements.txt
 	
 ## 2) Check Cuda version or Install [CUDA](https://developer.nvidia.com/cuda-toolkit)
-	nvcc -V
+	nvcc --version
 
 ## 3) Install CuPy module ( e.g., for CUDA 11.1 )
 	python3.9 -m pip install cupy-cuda11x
