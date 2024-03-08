@@ -20,10 +20,12 @@
 
 ## 6) Install CuPy module ( e.g., for CUDA 11.1 )
 	python3 -m pip install cupy-cuda11x
-
-## 7) Compile smoothPatch code:
-### Linux
-	gcc -shared -o smoothPatch.so smoothPatch.cpp
+ 
+## 7) Install Cucim
+	install git 
+	from ( https://github.com/rapidsai/cucim/issues/86 )
+	pip install -e "git+https://github.com/rapidsai/cucim.git@v22.12.00#egg=cucim&subdirectory=python/cucim"
+## Optional) Compile smoothPatch code if you have modified it ():
 ### Windows ( install https://winlibs.com/ )
 	gcc -c smoothPatch.cpp
 	gcc -shared -o smoothPatch.dll smoothPatch.o
