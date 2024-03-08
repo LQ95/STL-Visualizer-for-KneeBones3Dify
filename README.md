@@ -80,7 +80,7 @@ The software execution restarts from a specific intermediate state where modifie
 
 ## 8) New Output after parameter modifications:
 
-Finally, the user can see the final result in a new window.
+Finally, the user can see the final result after the VR visualization refreshes.
 
 <img src=docs/images/output2.png width="600">
 
