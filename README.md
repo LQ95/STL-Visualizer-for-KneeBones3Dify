@@ -33,7 +33,7 @@ In this repository, a copy of smoothPatch.dll is already provided.
 	gcc -shared -o smoothPatch.dll smoothPatch.o
 
  # Setup for the Visualizer
-## 1) Install Python3 modules: 
+## 1) Install Python modules: 
 	python3.9 -m pip install -r Visualizer/requirements.txt
 ## 2) Ensure that you have an OpenVR compatible headset
 
