@@ -1,7 +1,7 @@
 # StlVisualizer for KneeBones3Dify
 
 # Setup
-Install Python 3.9.13 https://www.python.org/downloads/
+Install Python 3.9.13 https://www.python.org/downloads/release/python-3913/
 
 # Setup for KneeBones3Dify
 
