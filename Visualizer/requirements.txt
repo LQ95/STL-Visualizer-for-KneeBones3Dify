@@ -1,0 +1,5 @@
+openvr
+pillow
+assimp_py
+pysdl2
+pyopengl
