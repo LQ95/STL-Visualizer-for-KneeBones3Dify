@@ -35,7 +35,7 @@ A dataset example is available at https://github.com/diego-romano/KneeBones3Dify
 
 ## 1) In the terminal, type the following command:
 	
- 	python3 SegOscan.py
+ 	python3.9 SegOscan.py
 
 ## 2) Startup GUI and input parameters:
 
