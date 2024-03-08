@@ -122,23 +122,23 @@ def main():
     
     global dataset, SogliaCrop, CHadd, FinalClosing, Protrus, Edges, flags,fin,data1,name,process
     
+    first_render_is_not_done= True
+    while(first_render_is_not_done):
+        sG()
+  
 
-    
-    sG()
-    # t1 = threading.Thread(target=g.log_info, args=[])
-    # t1.start()
-
-    global Tstart
-    Tstart = timeit.default_timer()
-    try:
-        for f in flags:
-            f()
-    except:
-        print("                        ################")
-        print("                        #### ERROR! ####")
-        print("                        ################")
-        g.GuiError()
-        return
+        global Tstart
+        Tstart = timeit.default_timer()
+        try:
+            for f in flags:
+                f()
+            first_render_is_not_done = False
+        except:
+            print("                        ################")
+            print("                        #### ERROR! ####")
+            print("                        ################")
+            g.GuiError()
+            first_render_is_not_done = True
         
 
     # for f in flags:
