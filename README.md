@@ -58,7 +58,7 @@ There is an error handler that checks the validity of the dataset in input. Afte
 ## 3) Execution log on the terminal:
 During the software execution, on the terminal, the user can see all the information about the Dicom dataset shape, MRI type, segmentation status, and execution times.
 
-<img src=docs/images/execution_log.png width="600">
+<img src=docs/images/execution_log.png width="800">
 
 ## 4) Output of the first execution:
 At the end of the execution, the VR visualization will start and we can see the result of our first render
@@ -76,7 +76,7 @@ If the user chooses to continue, he will have the possibility to change one or m
 
 The software execution restarts from a specific intermediate state where modified input parameters have an actual impact, avoiding the execution of the whole code . New input data will appear on the terminal, followed by the state number from which the execution restarts and the consequent execution log.
 
-<img src=docs/images/execution_log2.png width="600">
+<img src=docs/images/execution_log2.png width="800">
 
 ## 8) New Output after parameter modifications:
 
