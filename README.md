@@ -25,7 +25,8 @@ Type this into your Windows shell:
 	python3.9 -m pip install -e "git+https://github.com/rapidsai/cucim.git@v22.12.00#egg=cucim&subdirectory=python/cucim"
 ## Optional) How to Compile smoothPatch's code if you have modified it :
 This step absolutely unnecessary unless you have modified smoothPatch.cpp and want to make use of your custom version.
-In any other case, a copy of smoothPatch.dll is already provided.
+
+In this repository, a copy of smoothPatch.dll is already provided.
 
 ### Windows ( install https://winlibs.com/ )
 	gcc -c smoothPatch.cpp
