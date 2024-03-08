@@ -16,8 +16,8 @@ Install pip (if you have any specific issues with pip during setup, try revertin
 	python3.9 -m pip install cupy-cuda11x
  
 ## 4) Install Cucim
-	install git 
-	from ( https://github.com/rapidsai/cucim/issues/86 )
+install git 
+from ( https://github.com/rapidsai/cucim/issues/86 )
 	py -m pip install -e "git+https://github.com/rapidsai/cucim.git@v22.12.00#egg=cucim&subdirectory=python/cucim"
 ## Optional) Compile smoothPatch code if you have modified it ():
 ### Windows ( install https://winlibs.com/ )
