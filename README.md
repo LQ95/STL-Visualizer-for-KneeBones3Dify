@@ -26,7 +26,7 @@ Install Python 3.9 https://www.python.org/downloads/
 ## 7) Install Cucim
 	install git 
 	from ( https://github.com/rapidsai/cucim/issues/86 )
-	pip install -e "git+https://github.com/rapidsai/cucim.git@v22.12.00#egg=cucim&subdirectory=python/cucim"
+	py -m pip install -e "git+https://github.com/rapidsai/cucim.git@v22.12.00#egg=cucim&subdirectory=python/cucim"
 ## Optional) Compile smoothPatch code if you have modified it ():
 ### Windows ( install https://winlibs.com/ )
 	gcc -c smoothPatch.cpp
@@ -34,7 +34,7 @@ Install Python 3.9 https://www.python.org/downloads/
 
  # Setup for the Visualizer
 ## 1) Install Python3 modules: 
-	python3 -m pip install -r Visualizer/requirements.txt
+	python3.9 -m pip install -r Visualizer/requirements.txt
 ## 2) Ensure that you have an OpenVR compatible headset
 
 
