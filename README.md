@@ -18,6 +18,7 @@ Install pip (if you have any specific issues with pip during setup, try revertin
 ## 4) Install Cucim
 install git 
 (read https://github.com/rapidsai/cucim/issues/86 to understand more)
+
 type this into your Windows shell
 
 
