@@ -1,5 +1,5 @@
 # StlVisualizer for KneeBones3Dify
-This repository a version of [KneeBones3Dify](https://github.com/gigernau/KneeBones3Dify) that has been modified so that it could work in tandem with a VR STL visualizer  
+This repository includes a version of [KneeBones3Dify](https://github.com/gigernau/KneeBones3Dify) that has been modified so that it could work in tandem with a VR STL visualizer  
 # Setup
 Install Python 3.9.13 https://www.python.org/downloads/release/python-3913/
 Install pip (if you have any specific issues with pip during setup, try reverting to version 22.0.4)
