@@ -66,9 +66,19 @@ During the software execution, on the terminal, the user can see all the informa
 <img src=docs/images/execution_log.png width="1600">
 
 ## 4) Output of the first execution:
-At the end of the execution, the VR visualization will start and we can see the result of our first render
+At the end of the execution, the VR visualization will start and we can see the result of our first render.
 
 <img src=docs/images/output1.png width="600">
+
+### Controls
+
+Left trackpad rotates along the Y axis.
+
+Right trackpad rotates along the Z axis.
+
+Pushing the trackpad moves the model parallel to the floor.
+
+The model can be dragged around pushing the trigger button on one of the controllers.
 
 ## 5) Input parameters changes:
 
