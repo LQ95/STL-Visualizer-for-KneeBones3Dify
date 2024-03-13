@@ -1,7 +1,7 @@
 # StlVisualizer for KneeBones3Dify
 This repository includes a version of [KneeBones3Dify](https://github.com/gigernau/KneeBones3Dify) that has been modified so that it could work in tandem with a VR STL visualizer.
 
-this version of this software only works on Microsoft Windows.
+This version of this software only works on Microsoft Windows.
 
 # Setup
 Install Python 3.9.13 https://www.python.org/downloads/release/python-3913/
