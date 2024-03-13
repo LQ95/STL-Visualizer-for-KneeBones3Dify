@@ -49,6 +49,8 @@ In this repository, a copy of smoothPatch.dll is already provided.
 ## 1) Install Python modules: 
 	python3.9 -m pip install -r Visualizer/requirements.txt
  
+### SimpleITK and pyvista might require manual reinstalling
+ 
 ## 2) Ensure you have everything you need for the VR visualization
 
 Install Steam and SteamVR 
