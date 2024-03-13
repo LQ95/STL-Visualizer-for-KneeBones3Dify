@@ -5,4 +5,4 @@ SimpleITK
 pyvista
 cucim
 pynput
-win32api
+pywin32
