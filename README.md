@@ -5,9 +5,7 @@ Install Python 3.9.13 https://www.python.org/downloads/release/python-3913/
 
 Install pip (if you have any specific issues with pip during setup, try reverting to version 22.0.4)
 
-Install Steam and SteamVR 
 
-Ensure that you have an OpenVR compatible headset
 
 # Setup for KneeBones3Dify
 
@@ -38,10 +36,15 @@ In this repository, a copy of smoothPatch.dll is already provided.
 	gcc -shared -o smoothPatch.dll smoothPatch.o
 
  # Setup for the Visualizer
+ 
 ## 1) Install Python modules: 
 	python3.9 -m pip install -r Visualizer/requirements.txt
-## 2) Ensure that you have an OpenVR compatible headset
+ 
+## 2) Ensure you have everything you need for the VR visualization
 
+Install Steam and SteamVR 
+
+Ensure that you have an OpenVR compatible headset
 
 # Usage Example
 
