@@ -80,11 +80,15 @@ Pushing the trackpad moves the model parallel to the floor.
 
 The model can be dragged around pushing the trigger button on one of the controllers.
 
-## 5) Input parameters changes:
+The menu button opens the menu
+
+## 5) Changing the input parameters:
 
 If the user chooses to continue, he will have the possibility to change one or more parameters through the vr menu.
 
 <img src=docs/images/vr_menu_changes.png width="500">
+
+### Menu controls
 
 
 ## 7) Execution log after parameter modifications:
