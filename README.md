@@ -10,7 +10,7 @@ Install Python 3.9.13 https://www.python.org/downloads/release/python-3913/
 Install pip (if you have any specific issues with pip during setup, try reverting to version 22.0.4)
 
 IMPORTANT: if your command prompt doesn't recognize "python3.9" chances are you need to type "py" instead.
-So if any of the instructions below don't work for this reason after isntalling python, type "py" instread of "python3.9"
+So if any of the instructions below don't work for this reason after installing Python, type "py" instread of "python3.9"
 
 
 
