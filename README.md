@@ -72,9 +72,9 @@ At the end of the execution, the VR visualization will start and we can see the 
 
 ### Controls
 
-Left trackpad rotates along the Y axis.
+Left trackpad rotates the model along the Y axis.
 
-Right trackpad rotates along the Z axis.
+Right trackpad rotates the model along the Z axis.
 
 Pushing the trackpad moves the model parallel to the floor.
 
