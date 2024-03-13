@@ -26,7 +26,9 @@ So if any of the instructions below don't work for this reason after installing 
 	python3.9 -m pip install cupy-cuda11x
  
 ## 4) Install Cucim
-Install git 
+Install [git](https://git-scm.com/)
+
+
 (read https://github.com/rapidsai/cucim/issues/86 to understand more)
 
 Type this into your Windows shell:
