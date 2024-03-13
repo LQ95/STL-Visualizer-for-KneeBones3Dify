@@ -5,6 +5,7 @@ This version of this software only works on Microsoft Windows.
 
 # Setup
 Install Python 3.9.13 https://www.python.org/downloads/release/python-3913/
+(check the "Add python 3.9 to PATH" box in the installer)
 
 Install pip (if you have any specific issues with pip during setup, try reverting to version 22.0.4)
 
