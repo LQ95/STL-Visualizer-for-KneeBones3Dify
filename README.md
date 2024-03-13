@@ -5,6 +5,10 @@ Install Python 3.9.13 https://www.python.org/downloads/release/python-3913/
 
 Install pip (if you have any specific issues with pip during setup, try reverting to version 22.0.4)
 
+Install Steam and SteamVR 
+
+Ensure that you have an OpenVR compatible headset
+
 # Setup for KneeBones3Dify
 
 ## 1) Install Python modules: 
