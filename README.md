@@ -20,7 +20,7 @@ So if any of the instructions below don't work for this reason after installing 
 	python3.9 -m pip install -r requirements.txt
  #### WARNING: a few packages might require manual reinstalling, like SimpleITK, pyvista and scikit-image. 
 	
-## 2) Check Cuda version or Install [CUDA](https://developer.nvidia.com/cuda-toolkit)
+## 2) Check Cuda version or Install [CUDA Version 11.5](https://developer.nvidia.com/cuda-toolkit)
 	nvcc --version
 
 ## 3) Install CuPy module ( e.g., for CUDA 11.1 )
