@@ -55,15 +55,14 @@ In this repository, a copy of smoothPatch.dll is already provided.
 ## 1) Install Python modules: 
 	python3.9 -m pip install -r Visualizer/requirements.txt
  
-## 1.1) Set the PYSDL2_DLL_PATH environment variable for pySDL2
- 
-
  
 ## 2) Ensure you have everything you need for the VR visualization
 
 Install Steam and SteamVR 
 
 Ensure that you have an OpenVR compatible headset
+
+Verify whether SteamVR might need recalibration
 
 # Usage Example
 
