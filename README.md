@@ -58,7 +58,7 @@ In this repository, a copy of smoothPatch.dll is already provided.
  
 ## 2) Ensure you have everything you need for the VR visualization
 
-Install Steam and login/register
+Install Steam and login/register into a Steam account
 
 Install SteamVR
 
