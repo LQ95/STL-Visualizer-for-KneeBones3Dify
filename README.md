@@ -11,7 +11,7 @@ Install pip (if you have any specific issues with pip during setup, try revertin
 
 install or upgrade setuptools for python
 
-Install [Visual Studio Build Tools for Visual Studio 2022](https://aka.ms/vs/17/release/vs_BuildTools.exe)
+Install [Visual Studio Build Tools for Visual Studio 2022](https://aka.ms/vs/17/release/vs_BuildTools.exe) and check the first box in the components section
 
 IMPORTANT: if your command prompt doesn't recognize "python3.9" chances are you need to type "py" instead.
 So if any of the instructions below don't work for this reason after installing Python, type "py" instread of "python3.9"
