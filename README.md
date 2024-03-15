@@ -9,6 +9,10 @@ Install Python 3.9.13 https://www.python.org/downloads/release/python-3913/
 
 Install pip (if you have any specific issues with pip during setup, try reverting to version 22.0.4)
 
+install or upgrade setuptools for python
+
+Install [Visual Studio Build Tools for Visual Studio 2022](https://aka.ms/vs/17/release/vs_BuildTools.exe)
+
 IMPORTANT: if your command prompt doesn't recognize "python3.9" chances are you need to type "py" instead.
 So if any of the instructions below don't work for this reason after installing Python, type "py" instread of "python3.9"
 
@@ -23,8 +27,8 @@ So if any of the instructions below don't work for this reason after installing 
 ## 2) Check Cuda version or Install [CUDA Version 11.5](https://developer.nvidia.com/cuda-11-5-0-download-archive)
 	nvcc --version
 
-## 3) Install CuPy module ( e.g., for CUDA 11.1 )
-	python3.9 -m pip install cupy-cuda11x
+## 3) Install CuPy module for CUDA 11.5
+	python3.9 -m pip install cupy-cuda115
  
 ## 4) Install Cucim
 Install [git](https://git-scm.com/)
