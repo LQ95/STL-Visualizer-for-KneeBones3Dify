@@ -24,7 +24,7 @@ So if any of the instructions below don't work for this reason after installing 
 	python3.9 -m pip install -r requirements.txt
  #### WARNING: a few packages might require manual reinstalling, like SimpleITK, pyvista and scikit-image. 
  #### If it becomes necessary, check for the correct version in the requirements.txt file
-	
+ 
 ## 2) Check Cuda version or Install [CUDA Version 11.5](https://developer.nvidia.com/cuda-11-5-0-download-archive)
 	nvcc --version
 
@@ -54,6 +54,8 @@ In this repository, a copy of smoothPatch.dll is already provided.
  
 ## 1) Install Python modules: 
 	python3.9 -m pip install -r Visualizer/requirements.txt
+ 
+## 1.1) Set the PYSDL2_DLL_PATH environment variable for pySDL2
  
 
  
