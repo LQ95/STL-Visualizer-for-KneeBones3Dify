@@ -2,4 +2,5 @@ openvr
 pillow
 assimp_py
 pysdl2
+pysdl2-dll
 pyopengl
