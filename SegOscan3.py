@@ -146,6 +146,9 @@ def main():
     #temp_output_file = tempfile.NamedTemporaryFile()
     #temp_output_file_path=temp_output_file.name
     temp_output_file_path=tempfile.gettempdir() + "\\pipetest"
+    if (not os.path.exists(temp_output_file_path)):
+        temp_output_file = open(temp_output_file_path, "x")
+        temp_output_file.close()
     #creates the file,if it doesn't exist
     temp_output_file =open(temp_output_file_path, "r+")
     temp_output_file.close()
