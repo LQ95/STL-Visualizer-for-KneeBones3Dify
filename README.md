@@ -116,6 +116,15 @@ If the user chooses to continue, he will have the possibility to change one or m
 <img src=docs/images/vr_menu_changes.png width="500">
 
 ### Menu controls
+As said the section about the visualization controls, the menu button brings up or exits the menu.
+
+The menu is controlled entirely through presses of the trackpad.
+
+Pressing on the leftmost and rightmost areas of the track pad will modify the currently selected parameter's value.
+
+Pressing on the top and bottom corner changes the selected parameter/menu option.
+
+To re render, select "re-render" and press the center of the trackpad.
 
 
 ## 7) Execution log after parameter modifications:
