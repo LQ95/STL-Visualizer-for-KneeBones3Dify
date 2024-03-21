@@ -15,7 +15,7 @@ Install [Visual Studio Build Tools for Visual Studio 2022](https://aka.ms/vs/17/
 
 <img src=docs/images/Visual_studio_install_1.png width="500">
 
-if you have any issues,try also installing "Windows 10 SDK"(or Windows 11 SDK iff you're using Windows 11) and "MSVC v142 - VS2019 C++ Build Tools x64" from the  sidebar "Installation details" checkboxes
+if you have any issues,try also installing "Windows 10 SDK"(or Windows 11 SDK if you're using Windows 11) and "MSVC v142 - VS2019 C++ Build Tools x64" from the  sidebar "Installation details" checkboxes
 
 <img src=docs/images/Visual_studio_install_2.png width="500">
 
@@ -36,7 +36,11 @@ So if any of the instructions below don't work for this reason after installing 
 
 ## 3) Install CuPy module for CUDA 11.5
 	python3.9 -m pip install cupy-cuda115
- 
+
+If you have any issues, try installing cupy-cuda11x as well, along with cupy-cuda115
+
+	python3.9 -m pip install cupy-cuda11x
+
 ## 4) Install Cucim
 Install [git](https://git-scm.com/)
 
