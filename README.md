@@ -117,7 +117,12 @@ Pushing the trackpad moves the model parallel to the floor.
 
 The model can be dragged around pushing the trigger button on one of the controllers.
 
+<img src=docs/images/controller_trigger_button.jpg width="500">
+
 The menu button opens the menu
+
+<img src=docs/images/Menu_button.webp width="500">
+
 
 ## 5) Changing the input parameters:
 
