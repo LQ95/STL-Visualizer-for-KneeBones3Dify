@@ -38,6 +38,7 @@ So if any of the instructions below don't work for this reason after installing 
 	python3.9 -m pip install cupy-cuda115
 
 If you have any issues, try installing cupy-cuda11x as well, along with cupy-cuda115
+
 	python3.9 -m pip install cupy-cuda11x
 
 ## 4) Install Cucim
