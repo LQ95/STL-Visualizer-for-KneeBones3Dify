@@ -138,11 +138,11 @@ As said the section about the visualization controls, the menu button brings up 
 The menu is controlled entirely through presses of the trackpad.
 
 Pressing on the leftmost and rightmost areas of the track pad will modify the currently selected parameter's value.
-
+<img src=docs/images/Trackpad_menu_buttons_1.webp width="500">
 Pressing on the top and bottom corner changes the selected parameter/menu option.
-
+<img src=docs/images/Trackpad_menu_buttons_2.webp width="500">
 To re render, select "re-render" and press the center of the trackpad.
-
+<img src=docs/images/Trackpad_menu_buttons_3.webp width="500">
 
 ## 7) Execution log after parameter modifications:
 
