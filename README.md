@@ -115,6 +115,8 @@ Touching the right trackpad rotates the model along the Z axis.
 
 Pushing the trackpad moves the model parallel to the floor.
 
+<img src=docs/images/trackpad_explanation.jpeg width="500">
+
 The model can be dragged around pushing the trigger button on one of the controllers.
 
 <img src=docs/images/controller_trigger_button.jpg width="500">
