@@ -19,8 +19,8 @@ if you have any issues,try also installing "Windows 10 SDK"(or Windows 11 SDK if
 
 <img src=docs/images/Visual_studio_install_2.png width="500">
 
-IMPORTANT: if your command prompt doesn't recognize "python3.9" chances are you need to type "py" instead.
-So if any of the instructions below don't work for this reason after installing Python, type "py" instread of "python3.9"
+#### IMPORTANT: if your command prompt doesn't recognize "python3.9" chances are you need to type "py" instead.
+#### So, if any of the instructions below don't work for this reason after installing Python, type "py" instread of "python3.9"
 
 
 
