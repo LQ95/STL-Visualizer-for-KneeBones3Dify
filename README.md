@@ -35,11 +35,13 @@ if you have any issues,try also installing "Windows 10 SDK"(or Windows 11 SDK if
 	nvcc --version
 
 ## 3) Install CuPy module for CUDA 11.5
+	python3.9 -m pip install cupy-cuda11x
+
 	python3.9 -m pip install cupy-cuda115
 
-If you have any issues, try installing cupy-cuda11x as well, along with cupy-cuda115
+Both of these are necessary, if you have any issues, try reversing the order in which you install them.
 
-	python3.9 -m pip install cupy-cuda11x
+
 
 ## 4) Install Cucim
 Install [git](https://git-scm.com/)
